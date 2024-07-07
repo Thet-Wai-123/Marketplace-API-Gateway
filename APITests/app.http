@@ -1,0 +1,8 @@
+# For more info on HTTP files go to https://aka.ms/vs/httpfile
+POST https://localhost:7031/products/Post/New
+Content-Type: application/json
+{
+  "Name": "string",
+  "Price": 3,
+  "category": "string"
+}
