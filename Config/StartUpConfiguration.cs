@@ -1,6 +1,7 @@
-﻿using System.Text;
+﻿using MarketPlace_API_Gateway.Messaging_Queue;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace Marketplace_API_Gateway.Config
 {
@@ -8,8 +9,10 @@ namespace Marketplace_API_Gateway.Config
     {
         public static void StartUpConfigure(WebApplicationBuilder builder)
         {
+            //Secrets
             DotNetEnv.Env.Load();
 
+            //Authentication
             builder
                 .Services.AddAuthentication(cfg =>
                 {
@@ -33,6 +36,9 @@ namespace Marketplace_API_Gateway.Config
                     };
                 });
             builder.Services.AddAuthorization();
+
+            //RabbitMQ Messaging Broker
+            builder.Services.AddSingleton<IQueueMethods, QueueMethods>();
         }
     }
 }

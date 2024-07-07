@@ -1,7 +1,9 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using Marketplace_API_Gateway.DTOs;
+﻿using Marketplace_API_Gateway.DTOs;
+using MarketPlace_API_Gateway.Messaging_Queue;
 using Microsoft.AspNetCore.Authorization;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text.Json;
 
 namespace Marketplace_API_Gateway.Endpoints
 {
@@ -25,10 +27,22 @@ namespace Marketplace_API_Gateway.Endpoints
             group.MapGet("/{id}", () => { });
             group.MapPost(
                 "/Post/New",
-                [Authorize]
-                async (CreateProductDTO newProduct) =>
+                (CreateProductDTO newProduct, IQueueMethods queue) =>
                 {
-                    newProduct.PostedBy = 1;
+                    if (queue == null)
+                    {
+                        throw new ArgumentNullException(
+                            nameof(queue),
+                            "Queue service is not initialized."
+                        );
+                    }
+                    var content = new
+                    {
+                        Action = "CREATE",
+                        Info = newProduct
+                    };
+                    string task = JsonSerializer.Serialize(content);
+                    queue.SendTask(task, "Inventory");
                 }
             );
             group.MapPut("/{id}", async (UpdateProductDTO updatedProduct) => { });
@@ -41,7 +55,8 @@ namespace Marketplace_API_Gateway.Endpoints
             group.MapDelete("/ShoppingCart/Remove/{id}", async (int id) => { });
             group.MapGet(
                 "/ShoppingCart",
-                async () => {
+                async () =>
+                {
                     //return ShoppingCartSummaryDTO
                 }
             );
