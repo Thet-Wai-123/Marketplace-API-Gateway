@@ -1,10 +1,10 @@
-﻿using RabbitMQ.Client;
-using System.Text;
+﻿using System.Text;
 using System.Threading.Channels;
+using RabbitMQ.Client;
 
 namespace MarketPlace_API_Gateway.Messaging_Queue
 {
-    public class QueueMethods :IQueueMethods
+    public class QueueMethods : IQueueMethods
     {
         private IModel _channel;
 
@@ -34,21 +34,17 @@ namespace MarketPlace_API_Gateway.Messaging_Queue
             _channel.BasicQos(prefetchSize: 0, prefetchCount: 1, global: false);
         }
 
-        public void SendTask(string task, string toService)
+        public void SendTask(string action, string requiredInfo, string toService)
         {
-            var body = Encoding.UTF8.GetBytes(task);
-
-            if (_channel == null)
-            {
-                throw new ArgumentNullException(
-                    nameof(_channel),
-                    "Channel service is not initialized."
-                );
-            }
+            var body = Encoding.UTF8.GetBytes(requiredInfo);
+            IBasicProperties props = _channel.CreateBasicProperties();
+            props.ContentType = "application/json"; //btw this does nothing, cause rabbitmq sends it as a byte array
+            props.DeliveryMode = 2;
+            props.Headers = new Dictionary<string, object> { { "Action", action } };
             _channel.BasicPublish(
                 exchange: string.Empty,
                 routingKey: toService + "_queue",
-                basicProperties: null,
+                basicProperties: props,
                 body: body
             );
         }

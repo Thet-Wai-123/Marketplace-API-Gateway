@@ -2,6 +2,6 @@
 {
     public interface IQueueMethods
     {
-        void SendTask(string task, string toService);
+        void SendTask(string action, string requiredInfo, string toService);
     }
 }

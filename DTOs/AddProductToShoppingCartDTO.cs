@@ -2,9 +2,12 @@
 {
     public record class AddProductToShoppingCartDTO
     {
-        public required int UserId { get; set; }
         public required int ItemId { get; set; }
 
-        public required ProductSummaryDTO Product { get; set; }
+        public required string Name { get; set; }
+
+        public required decimal Price { get; set; }
+
+        public string? PostedBy { get; set; }
     }
 }
