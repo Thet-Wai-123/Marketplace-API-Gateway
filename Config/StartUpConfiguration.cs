@@ -30,8 +30,10 @@ namespace Marketplace_API_Gateway.Config
                         IssuerSigningKey = new SymmetricSecurityKey(
                             Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWTKey"))
                         ),
-                        ValidateIssuer = false,
-                        ValidateAudience = false,
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidIssuer = Environment.GetEnvironmentVariable("JWTIssuer"),
+                        ValidAudience = Environment.GetEnvironmentVariable("JWTAudience"),
                         ClockSkew = TimeSpan.Zero
                     };
                 });
