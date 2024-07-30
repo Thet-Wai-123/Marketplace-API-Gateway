@@ -1,6 +1,4 @@
-﻿using System.Net.Http;
-using System.Security.Claims;
-using System.Text.Json;
+﻿using System.Text.Json;
 using Marketplace_API_Gateway.DTOs;
 using MarketPlace_API_Gateway.DTOs;
 using MarketPlace_API_Gateway.DTOs.Shopping_Cart_Services;
