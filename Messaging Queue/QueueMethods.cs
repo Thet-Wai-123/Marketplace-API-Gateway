@@ -12,7 +12,9 @@ namespace MarketPlace_API_Gateway.Messaging_Queue
         {
             var factory = new ConnectionFactory
             {
-                HostName = Environment.GetEnvironmentVariable("MessagingQueue")
+                HostName = Environment.GetEnvironmentVariable("MessagingQueueHostName"),
+                UserName = Environment.GetEnvironmentVariable("MessagingQueueUsername"),
+                Password = Environment.GetEnvironmentVariable("MessagingQueuePassword")
             };
             var connection = factory.CreateConnection();
             _channel = connection.CreateModel();
