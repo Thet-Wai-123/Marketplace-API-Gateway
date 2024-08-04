@@ -1,8 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using Marketplace_API_Gateway.DTOs;
 using MarketPlace_API_Gateway.DTOs;
+using MarketPlace_API_Gateway.DTOs.Inventory_Services;
 using MarketPlace_API_Gateway.Messaging_Queue;
 using Microsoft.AspNetCore.Mvc;
 
@@ -55,8 +57,13 @@ namespace MarketPlace_API_Gateway.Endpoints
                 "/New",
                 (CreateProductDTO newProduct, HttpContext httpContext, IQueueMethods queue) =>
                 {
+                    if (newProduct.Price > app.Configuration.GetValue<int>("MaxPrice"))
+                    {
+                        return Results.BadRequest("Price is too high");
+                    }
                     EndpointsHelperMethods.AddUserIdToPostedBy(httpContext, newProduct);
                     queue.SendTask("CREATE", JsonSerializer.Serialize(newProduct), "Inventory");
+                    return Results.Ok("Success");
                 }
             );
 
@@ -95,10 +102,11 @@ namespace MarketPlace_API_Gateway.Endpoints
             //POST search for item in Inventory
             group.MapPost(
                 "/query",
-                (
+                async (
                     [FromQuery] [Required] string keyword,
-                    [FromQuery] int minPrice,
-                    HttpClient httpClient
+                    HttpClient httpClient,
+                    [FromQuery] decimal? minPrice,
+                    [FromQuery] decimal? maxPrice
                 ) =>
                 {
                     if (keyword == null)
@@ -111,11 +119,25 @@ namespace MarketPlace_API_Gateway.Endpoints
                     {
                         sb.Replace(breakWord, "");
                     }
-                    var queries = httpClient.PostAsJsonAsync(
+                    QueryProductDTO productToQuery =
+                        new()
+                        {
+                            keyword = sb.ToString(),
+                            minPrice = minPrice,
+                            maxPrice = maxPrice,
+                        };
+                    var response = await httpClient.PostAsJsonAsync(
                         Environment.GetEnvironmentVariable("InventoryServiceURL") + "query",
-                        sb.ToString()
+                        productToQuery
                     );
-                    return Results.Ok(queries);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Results.Ok(response.Content.ReadAsStringAsync().Result);
+                    }
+                    else
+                    {
+                        return Results.StatusCode(503);
+                    }
                     //    .split(/\s+/)
                     //    .join("|");
                 }
