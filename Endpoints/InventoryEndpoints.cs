@@ -57,10 +57,6 @@ namespace MarketPlace_API_Gateway.Endpoints
                 "/New",
                 (CreateProductDTO newProduct, HttpContext httpContext, IQueueMethods queue) =>
                 {
-                    if (newProduct.Price > app.Configuration.GetValue<int>("MaxPrice"))
-                    {
-                        return Results.BadRequest("Price is too high");
-                    }
                     EndpointsHelperMethods.AddUserIdToPostedBy(httpContext, newProduct);
                     queue.SendTask("CREATE", JsonSerializer.Serialize(newProduct), "Inventory");
                     return Results.Ok("Success");
