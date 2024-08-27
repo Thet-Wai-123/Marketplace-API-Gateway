@@ -67,11 +67,11 @@ DELETE /Inventory/Delete/{id}
 
 #### Get All Products in Shopping Cart
 
-GET /ShoppingCart/{id}
+GET /ShoppingCart/
 
 | Parameter | Type | Description |
 | --- | --- | --- |
-| id | int | **Required**. Id of the shopping cart |
+| N/A | N/A | Get all the items stored in shopping cart. Returns id of the user and id of the item|
 
 #### Add New Item to Shopping Cart
 
