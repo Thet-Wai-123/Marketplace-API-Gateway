@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Threading.Channels;
+using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 
 namespace MarketPlace_API_Gateway.Messaging_Queue

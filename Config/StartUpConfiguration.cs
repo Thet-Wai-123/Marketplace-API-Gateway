@@ -39,8 +39,11 @@ namespace Marketplace_API_Gateway.Config
                 });
             builder.Services.AddAuthorization();
 
-            //RabbitMQ Messaging Broker
+            //RabbitMQ Sending Service Queue
             builder.Services.AddSingleton<IQueueMethods, QueueMethods>();
+
+            //RabbitMQ RPC Client
+            builder.Services.AddSingleton<IRpcClient, RprClient>();
 
             // Register HttpClient
             builder.Services.AddHttpClient();

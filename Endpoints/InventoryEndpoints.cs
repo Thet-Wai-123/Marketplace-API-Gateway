@@ -52,6 +52,24 @@ namespace MarketPlace_API_Gateway.Endpoints
                 }
             );
 
+            group.MapGet(
+                "/{id}",
+                async (HttpClient httpClient, int id) =>
+                {
+                    var response = await httpClient.GetAsync(
+                        Environment.GetEnvironmentVariable("InventoryServiceURL") + id
+                    );
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Results.Ok(response.Content.ReadAsStringAsync());
+                    }
+                    else
+                    {
+                        return Results.StatusCode(503);
+                    }
+                }
+            );
+
             //POST new item to Inventory
             group.MapPost(
                 "/New",
